@@ -55,7 +55,7 @@ export function UserView({ user }: UserViewProps) {
         <h1 className="text-3xl font-bold text-gradient">
           Merhaba, {user.username}!
         </h1>
-        <p className="text-white/60">Gizli Noel Baba Çekilişlerinize Hoş Geldiniz</p>
+        <p className="text-white/60">Yeni Yıl Çekilişlerinize Hoş Geldiniz</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

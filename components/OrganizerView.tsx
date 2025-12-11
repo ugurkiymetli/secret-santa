@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
-import { Users, Gift, Play, Plus, Trash2, Calendar, UserPlus, Shuffle } from "lucide-react"
+import { Users, Plus, Trash2, Calendar, UserPlus, Shuffle } from "lucide-react"
 
 interface User {
   _id: string;
@@ -95,7 +95,7 @@ export function OrganizerView() {
   }
 
   const deleteEvent = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this event? Matches will be lost.")) return
+    if (!confirm("Bu etkinliği silmek istediğinize emin misiniz? Eşleşmeler kaybolacaktır.")) return
 
     const res = await fetch(`/api/admin/events?id=${id}`, {
       method: "DELETE"
@@ -109,7 +109,7 @@ export function OrganizerView() {
 
   const handleMatch = async () => {
     if (!selectedEventId) return
-    if (!confirm("Are you sure? This will shuffle matches for this event.")) return
+    if (!confirm("Emin misiniz? Bu işlem bu etkinlik için eşleşmeleri karıştıracaktır.")) return
     
     setLoading(true)
     const res = await fetch("/api/admin/match", {
@@ -122,10 +122,9 @@ export function OrganizerView() {
     setLoading(false)
     
     if (res.ok) {
-      setMessage(`Successfully matched ${data.count} participants!`)
+      setMessage(`${data.count} katılımcı başarıyla eşleştirildi!`)
       fetchEvents() // Refresh status
     } else {
-      setMessage(`Error: ${data.error}`)
       setMessage(`Hata: ${data.error}`)
     }
   }
@@ -305,7 +304,7 @@ export function OrganizerView() {
           </Card>
         ) : (
           <div className="flex items-center justify-center h-full min-h-[300px] border border-dashed border-white/20 rounded-lg bg-white/5 text-white/40">
-            Yönetmek için soldan bir etkinlik seçin
+            Yönetmek için bir etkinlik seçin
           </div>
         )}
       </div>
