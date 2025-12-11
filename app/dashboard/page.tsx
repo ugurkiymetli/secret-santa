@@ -20,7 +20,7 @@ async function getUser() {
   if (!payload) return null
   
   await dbConnect()
-  const user = await User.findById(payload.userId).populate('assignedMatch').lean()
+  const user = await User.findById(payload.userId).lean()
   return user
 }
 
@@ -41,12 +41,12 @@ export default async function Dashboard() {
     <div className="min-h-screen p-4 md:p-8">
       <header className="flex justify-between items-center max-w-6xl mx-auto mb-12">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-violet-600" />
-          <span className="font-bold text-lg tracking-tight">Secret Santa</span>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-white" />
+          <span className="font-bold text-lg tracking-tight">Yılbaşı Çekilişi</span>
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm text-slate-400 hidden md:inline">
-            Logged in as <span className="text-slate-200">{user.username}</span>
+            Hoşgeldin, <span className="text-slate-200">{user.username}</span>
           </span>
           <LogoutButton />
         </div>
@@ -56,11 +56,7 @@ export default async function Dashboard() {
         {user.role === 'ORGANIZER' ? (
           <OrganizerView />
         ) : (
-          <UserView 
-            user={JSON.parse(JSON.stringify(user))} 
-            matchName={user.assignedMatch?.username || null}
-            giftLimit={event?.giftLimit || 0}
-          />
+          <UserView user={JSON.parse(JSON.stringify(user))} />
         )}
       </main>
     </div>

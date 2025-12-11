@@ -1,20 +1,43 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card"
-import { Gift, Eye, EyeOff } from "lucide-react"
+import { Gift, Eye, EyeOff, Calendar, ChevronRight } from "lucide-react"
 import confetti from "canvas-confetti"
 import { motion, AnimatePresence } from "framer-motion"
 
-interface UserViewProps {
-  user: any;
-  matchName: string | null;
+interface Event {
+  _id: string;
+  name: string;
   giftLimit: number;
+  giftDate?: string;
+  matchName: string | null;
 }
 
-export function UserView({ user, matchName, giftLimit }: UserViewProps) {
+interface UserViewProps {
+  user: any;
+}
+
+export function UserView({ user }: UserViewProps) {
+  const [events, setEvents] = useState<Event[]>([])
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [revealed, setRevealed] = useState(false)
+
+  useEffect(() => {
+    fetchEvents()
+  }, [])
+
+  const fetchEvents = async () => {
+    const res = await fetch("/api/events")
+    const data = await res.json()
+    if (data.events) {
+      setEvents(data.events)
+      if (data.events.length > 0) {
+        setSelectedEvent(data.events[0])
+      }
+    }
+  }
 
   const handleReveal = () => {
     setRevealed(true)
@@ -27,77 +50,120 @@ export function UserView({ user, matchName, giftLimit }: UserViewProps) {
   }
 
   return (
-    <div className="max-w-md mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8">
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold text-gradient">
-          Hello, {user.username}!
+          Merhaba, {user.username}!
         </h1>
-        <p className="text-white/60">Welcome to the Secret Santa Exchange</p>
+        <p className="text-white/60">Gizli Noel Baba Çekilişlerinize Hoş Geldiniz</p>
       </div>
 
-      <Card className="border-white/10 shadow-amber-500/5">
-        <CardHeader className="text-center pb-2">
-          <CardTitle>Your Mission</CardTitle>
-          <CardDescription>
-            Budget Limit: <span className="font-bold text-green-400">${giftLimit}</span>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center py-8 space-y-6">
-          <div className="relative w-full h-48 flex items-center justify-center">
-            <AnimatePresence mode="wait">
-              {!revealed ? (
-                <motion.div
-                  key="hidden"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8, rotateY: 90 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 rounded-xl border border-dashed border-white/20 cursor-pointer hover:bg-black/30 transition-colors group"
-                  onClick={handleReveal}
-                >
-                  <Gift className="w-16 h-16 text-white/40 group-hover:text-amber-400 transition-colors mb-4" />
-                  <p className="text-sm font-medium text-white/60 group-hover:text-white">
-                    Tap to reveal your match
-                  </p>
-                </motion.div>
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Event List */}
+        <Card className="border-white/10 shadow-white/5 h-fit">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Gift className="w-5 h-5 text-white" />
+              Çekilişlerim
+            </CardTitle>
+            <CardDescription>Katıldığınız etkinlikler</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {events.length === 0 && <p className="text-sm text-white/50">Henüz bir etkinliğe katılmadınız.</p>}
+            {events.map(event => (
+              <div 
+                key={event._id} 
+                className={`p-3 rounded border cursor-pointer transition-colors flex justify-between items-center ${
+                  selectedEvent?._id === event._id 
+                    ? 'bg-white/10 border-white/30' 
+                    : 'bg-black/20 border-white/10 hover:bg-white/5'
+                }`}
+                onClick={() => {
+                  setSelectedEvent(event);
+                  setRevealed(false);
+                }}
+              >
+                <span className="font-medium text-white">{event.name}</span>
+                <ChevronRight className="w-4 h-4 text-white/50" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Event Detail / Reveal */}
+        {selectedEvent ? (
+          <Card className="border-white/10 shadow-white/5 h-fit">
+            <CardHeader className="text-center pb-2">
+              <CardTitle>{selectedEvent.name}</CardTitle>
+              <CardDescription className="flex flex-col gap-1">
+                <span>Hediye Limiti: <span className="font-bold text-green-400">{selectedEvent.giftLimit} TL</span></span>
+                {selectedEvent.giftDate && (
+                  <span>Çekiliş Tarihi: <span className="font-bold text-white">{new Date(selectedEvent.giftDate).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', dateStyle: 'long'})}</span></span>
+                )}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center py-8 space-y-6">
+              {selectedEvent.matchName ? (
+                <div className="relative w-64 h-64 cursor-pointer perspective-1000" onClick={handleReveal}>
+                  <motion.div
+                    initial={false}
+                    animate={{ rotateY: revealed ? 180 : 0 }}
+                    transition={{ duration: 0.6, type: "spring" }}
+                    className="w-full h-full relative preserve-3d"
+                  >
+                    {/* Front (Scratch Card) */}
+                    <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-red-600 to-red-800 rounded-xl shadow-2xl flex flex-col items-center justify-center border-4 border-white/20">
+                      <Gift className="w-16 h-16 text-white mb-4 animate-bounce" />
+                      <p className="text-white font-bold text-xl">Eşleşmeni Gör</p>
+                      <p className="text-white/60 text-sm mt-2">Öğrenmek için tıkla!</p>
+                    </div>
+
+                    {/* Back (Result) */}
+                    <div className="absolute inset-0 backface-hidden rotate-y-180 bg-white rounded-xl shadow-2xl flex flex-col items-center justify-center border-4 border-white p-6">
+                      <p className="text-gray-500 font-medium mb-2">Senin Eşleşmen:</p>
+                      <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-500 text-center break-all">
+                        {selectedEvent.matchName}
+                      </h2>
+                      <div className="mt-6 text-center">
+                        <p className="text-xs text-gray-400">Şşşt! Kimseye söyleme 🤫</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
               ) : (
+                <div className="text-center p-8 bg-white/5 rounded-lg border border-dashed border-white/10">
+                  <p className="text-white/60">Henüz eşleşme yapılmadı.</p>
+                  <p className="text-xs text-white/40 mt-2">Organizatör çekilişi başlattığında burada göreceksin.</p>
+                </div>
+              )}
+
+              {revealed && selectedEvent.matchName && (
                 <motion.div
-                  key="revealed"
-                  initial={{ opacity: 0, scale: 0.8, rotateY: -90 }}
-                  animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-red-900/50 to-amber-900/50 rounded-xl border border-amber-500/30"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
                 >
-                  <p className="text-sm text-white/60 mb-2">You are buying a gift for</p>
-                  <h2 className="text-3xl font-bold text-white tracking-wider drop-shadow-lg">
-                    {matchName || "Waiting for Match..."}
-                  </h2>
-                  {!matchName && (
-                    <p className="text-xs text-amber-200/80 mt-2">
-                      (The organizer hasn't started the exchange yet)
-                    </p>
-                  )}
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setRevealed(false);
+                    }}
+                    className="text-white/40 hover:text-white"
+                  >
+                    <EyeOff className="w-4 h-4 mr-2" /> Gizle
+                  </Button>
                 </motion.div>
               )}
-            </AnimatePresence>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="flex items-center justify-center h-full min-h-[300px] text-white/40">
+            Select an event to view details
           </div>
-
-          {revealed && matchName && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => setRevealed(false)}
-                className="text-white/40 hover:text-white"
-              >
-                <EyeOff className="w-4 h-4 mr-2" /> Hide Match
-              </Button>
-            </motion.div>
-          )}
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </div>
   )
 }
