@@ -10,9 +10,9 @@ export interface ButtonProps extends HTMLMotionProps<"button"> {
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'default', size = 'default', ...props }, ref) => {
     const variants = {
-      default: "bg-gradient-to-r from-pink-500 to-violet-600 text-white hover:opacity-90 shadow-lg shadow-pink-500/20",
-      outline: "border border-slate-600 bg-transparent hover:bg-slate-800 text-slate-200",
-      ghost: "hover:bg-slate-800 text-slate-200",
+      default: "bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-950 hover:from-amber-300 hover:to-yellow-400 shadow-lg shadow-amber-500/20 font-bold",
+      outline: "border border-white/20 bg-white/5 hover:bg-white/10 text-white",
+      ghost: "hover:bg-white/10 text-white",
     }
     
     const sizes = {

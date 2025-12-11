@@ -29,13 +29,13 @@ export function UserView({ user, matchName, giftLimit }: UserViewProps) {
   return (
     <div className="max-w-md mx-auto space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-violet-500">
+        <h1 className="text-3xl font-bold text-gradient">
           Hello, {user.username}!
         </h1>
-        <p className="text-slate-400">Welcome to the Secret Santa Exchange</p>
+        <p className="text-white/60">Welcome to the Secret Santa Exchange</p>
       </div>
 
-      <Card className="border-pink-500/30 shadow-pink-500/10">
+      <Card className="border-white/10 shadow-amber-500/5">
         <CardHeader className="text-center pb-2">
           <CardTitle>Your Mission</CardTitle>
           <CardDescription>
@@ -51,11 +51,11 @@ export function UserView({ user, matchName, giftLimit }: UserViewProps) {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8, rotateY: 90 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center bg-slate-800/50 rounded-xl border border-dashed border-slate-600 cursor-pointer hover:bg-slate-800/80 transition-colors group"
+                  className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 rounded-xl border border-dashed border-white/20 cursor-pointer hover:bg-black/30 transition-colors group"
                   onClick={handleReveal}
                 >
-                  <Gift className="w-16 h-16 text-slate-500 group-hover:text-pink-500 transition-colors mb-4" />
-                  <p className="text-sm font-medium text-slate-400 group-hover:text-slate-200">
+                  <Gift className="w-16 h-16 text-white/40 group-hover:text-amber-400 transition-colors mb-4" />
+                  <p className="text-sm font-medium text-white/60 group-hover:text-white">
                     Tap to reveal your match
                   </p>
                 </motion.div>
@@ -64,14 +64,14 @@ export function UserView({ user, matchName, giftLimit }: UserViewProps) {
                   key="revealed"
                   initial={{ opacity: 0, scale: 0.8, rotateY: -90 }}
                   animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-pink-500/20 to-violet-600/20 rounded-xl border border-pink-500/50"
+                  className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-red-900/50 to-amber-900/50 rounded-xl border border-amber-500/30"
                 >
-                  <p className="text-sm text-slate-400 mb-2">You are buying a gift for</p>
-                  <h2 className="text-3xl font-bold text-white tracking-wider">
+                  <p className="text-sm text-white/60 mb-2">You are buying a gift for</p>
+                  <h2 className="text-3xl font-bold text-white tracking-wider drop-shadow-lg">
                     {matchName || "Waiting for Match..."}
                   </h2>
                   {!matchName && (
-                    <p className="text-xs text-yellow-400 mt-2">
+                    <p className="text-xs text-amber-200/80 mt-2">
                       (The organizer hasn't started the exchange yet)
                     </p>
                   )}
@@ -90,7 +90,7 @@ export function UserView({ user, matchName, giftLimit }: UserViewProps) {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setRevealed(false)}
-                className="text-slate-500 hover:text-slate-300"
+                className="text-white/40 hover:text-white"
               >
                 <EyeOff className="w-4 h-4 mr-2" /> Hide Match
               </Button>

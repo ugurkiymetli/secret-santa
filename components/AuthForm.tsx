@@ -54,8 +54,8 @@ export function AuthForm() {
     <Card className="w-[350px]">
       <CardHeader className="space-y-1">
         <div className="flex justify-center mb-4">
-          <div className="p-3 rounded-full bg-pink-500/20">
-            <Gift className="w-8 h-8 text-pink-500" />
+          <div className="p-3 rounded-full bg-white/10 ring-1 ring-white/20">
+            <Gift className="w-8 h-8 text-amber-400" />
           </div>
         </div>
         <CardTitle className="text-center">Secret Santa</CardTitle>
@@ -85,7 +85,7 @@ export function AuthForm() {
                 required
               />
             </div>
-            {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+            {error && <p className="text-sm text-red-300 text-center bg-red-900/50 py-1 rounded border border-red-500/20">{error}</p>}
           </div>
           <Button className="w-full mt-6" type="submit" disabled={loading}>
             {loading ? "Loading..." : (isLogin ? "Login" : "Claim Account")}
@@ -97,7 +97,7 @@ export function AuthForm() {
           variant="ghost" 
           size="sm" 
           onClick={() => setIsLogin(!isLogin)}
-          className="text-xs text-slate-400"
+          className="text-xs text-white/50 hover:text-white"
         >
           {isLogin ? "Need to claim account?" : "Already have an account?"}
         </Button>

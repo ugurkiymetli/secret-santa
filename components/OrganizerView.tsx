@@ -89,15 +89,15 @@ export function OrganizerView() {
             </form>
             <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
               {users.map((user) => (
-                <div key={user._id} className="flex items-center justify-between p-2 rounded bg-slate-800/50">
-                  <span className="font-medium">{user.username}</span>
-                  <span className="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300">
+                <div key={user._id} className="flex items-center justify-between p-2 rounded bg-black/20 border border-white/10">
+                  <span className="font-medium text-white">{user.username}</span>
+                  <span className="text-xs px-2 py-1 rounded bg-white/10 text-white/80">
                     {user.role}
                   </span>
                 </div>
               ))}
               {users.length === 0 && (
-                <p className="text-center text-slate-500 py-4">No participants yet</p>
+                <p className="text-center text-white/50 py-4">No participants yet</p>
               )}
             </div>
           </CardContent>
@@ -106,13 +106,13 @@ export function OrganizerView() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Gift className="w-5 h-5" /> Exchange Settings
+              <Gift className="w-5 h-5 text-amber-400" /> Exchange Settings
             </CardTitle>
             <CardDescription>Configure and start the event</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Gift Value Limit ($)</label>
+              <label className="text-sm font-medium text-white/80">Gift Value Limit ($)</label>
               <Input 
                 type="number" 
                 value={giftLimit}
@@ -135,7 +135,7 @@ export function OrganizerView() {
               </p>
             )}
             
-            <div className="p-4 rounded bg-yellow-500/10 border border-yellow-500/20 text-xs text-yellow-200">
+            <div className="p-4 rounded bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200">
               <p className="font-bold mb-1">⚠️ Important</p>
               Starting the exchange will assign matches. Users can then log in to see their match. You will not see who matched with whom.
             </div>
