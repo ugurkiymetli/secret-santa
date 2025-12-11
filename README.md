@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Secret Santa App
 
-## Getting Started
+A secure, mobile-responsive Secret Santa application built with Next.js, MongoDB, and Tailwind CSS.
 
-First, run the development server:
+## Features
+- **Role-based Dashboards**: Separate views for Organizers and Participants.
+- **Secure Matching**: Organizers trigger the match but can't see who got whom.
+- **Rich UI**: Glassmorphism design with animations.
+- **Claim Flow**: Users claim their pre-assigned accounts.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Local Development
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. **Environment Variables**:
+   Create a `.env.local` file in the root directory:
+   ```env
+   MONGODB_URI=mongodb://localhost:27017/secret-santa
+   JWT_SECRET=your-super-secret-key-change-me
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. **Run Locally**:
+   ```bash
+   npm run dev
+   ```
 
-## Learn More
+4. **Initial Setup**:
+   - Create the first admin user:
+     ```bash
+     curl -X POST http://localhost:3000/api/admin/users -H "Content-Type: application/json" -d '{"username":"admin", "role":"ORGANIZER"}'
+     ```
+   - Go to `http://localhost:3000`, click "Need to claim account?", and claim the `admin` account.
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment (Vercel)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Database**: 
+   - Create a free MongoDB cluster on [MongoDB Atlas](https://www.mongodb.com/atlas/database).
+   - Get your connection string (e.g., `mongodb+srv://<user>:<password>@cluster0.mongodb.net/secret-santa`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Vercel Project**:
+   - Import this repository to Vercel.
+   - In **Settings > Environment Variables**, add:
+     - `MONGODB_URI`: Your MongoDB Atlas connection string.
+     - `JWT_SECRET`: A long random string (e.g., generated via `openssl rand -base64 32`).
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. **Deploy**:
+   - Click Deploy. Vercel will build and host your app.
