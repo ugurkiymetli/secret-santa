@@ -12,12 +12,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/Card";
-import { Gift } from "lucide-react";
+import { Gift, Eye, EyeOff } from "lucide-react";
 
 export function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -28,6 +30,19 @@ export function AuthForm() {
     setLoading(true);
 
     try {
+      if (!isLogin) {
+        if (password.length < 6) {
+          setError("Şifre en az 6 karakter olmalıdır.");
+          setLoading(false);
+          return;
+        }
+        if (password !== confirmPassword) {
+          setError("Şifreler eşleşmiyor.");
+          setLoading(false);
+          return;
+        }
+      }
+
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/claim";
       const res = await fetch(endpoint, {
         method: "POST",
@@ -89,16 +104,39 @@ export function AuthForm() {
                 required
               />
             </div>
-            <div className="flex flex-col space-y-1.5">
+            <div className="flex flex-col space-y-1.5 relative">
               <Input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder={isLogin ? "Şifre" : "Yeni Şifre Belirle"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
             </div>
+            {!isLogin && (
+              <div className="flex flex-col space-y-1.5 relative">
+                <Input
+                  id="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Şifreyi Onayla"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+            )}
             {error && (
               <p className="text-sm text-red-300 text-center bg-red-900/50 py-1 rounded border border-red-500/20">
                 {error}
