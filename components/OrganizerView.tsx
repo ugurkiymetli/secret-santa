@@ -15,6 +15,7 @@ import { Users, Plus, Trash2, Calendar, UserPlus, Shuffle } from "lucide-react";
 interface User {
   _id: string;
   username: string;
+  name: string;
   role: string;
 }
 
@@ -88,7 +89,7 @@ export function OrganizerView() {
     const res = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: newUser }),
+      body: JSON.stringify({ name: newUser }),
     });
 
     if (res.ok) {
@@ -229,11 +230,16 @@ export function OrganizerView() {
                       <div
                         className={`w-8 h-8 rounded-full ${color} flex items-center justify-center text-white font-bold text-xs shadow-lg ring-2 ring-white/20`}
                       >
-                        {user.username.charAt(0).toUpperCase()}
+                        {(user.name || user.username).charAt(0).toUpperCase()}
                       </div>
-                      <span className="font-medium text-white">
-                        {user.username}
-                      </span>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-white leading-none">
+                          {user.name || user.username}
+                        </span>
+                        <span className="text-[10px] text-white/50 font-mono mt-1">
+                          {user.username}
+                        </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs px-2 py-1 rounded bg-white/10 text-white/80">
@@ -475,6 +481,9 @@ export function OrganizerView() {
                                 : "text-white/60"
                             }`}
                           >
+                            {user.name}
+                          </span>
+                          <span className="text-[10px] text-white/50 font-mono mt-1">
                             {user.username}
                           </span>
                         </div>
