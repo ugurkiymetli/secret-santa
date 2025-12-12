@@ -25,14 +25,13 @@ interface UserViewProps {
   user: any;
 }
 
+const CONFETTI_LIMIT = 2;
 export function UserView({ user }: UserViewProps) {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [revealed, setRevealed] = useState(false);
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
+  const [clickCount, setClickCount] = useState(0);
+  const [isCooldown, setIsCooldown] = useState(false);
 
   const fetchEvents = async () => {
     const res = await fetch("/api/events");
@@ -44,11 +43,29 @@ export function UserView({ user }: UserViewProps) {
       }
     }
   };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
   const randomInRange = (min: number, max: number) => {
     return Math.random() * (max - min) + min;
   };
 
   const handleReveal = async () => {
+    if (isCooldown) return;
+
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+
+    if (newCount >= CONFETTI_LIMIT) {
+      setIsCooldown(true);
+      setTimeout(() => {
+        setIsCooldown(false);
+        setClickCount(0);
+      }, 5000);
+    }
+
     setRevealed(true);
     for (let i = 0; i < randomInRange(10, 15); i++) {
       confetti({
