@@ -52,3 +52,40 @@ export async function GET() {
     );
   }
 }
+
+export async function POST(req: Request) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const payload: any = await verifyToken(token);
+  if (!payload) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { eventId } = await req.json();
+    await dbConnect();
+
+    await Event.updateOne(
+      { _id: eventId, "matches.giver": payload.userId },
+      {
+        $set: {
+          "matches.$.isRevealed": true,
+          "matches.$.giverRevealedDate": new Date(),
+        },
+      }
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error revealing match:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}

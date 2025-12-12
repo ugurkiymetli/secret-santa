@@ -150,6 +150,11 @@ export function AuthForm() {
               ? "Giriş Yap"
               : "Hesabı Doğrula"}
           </Button>
+          {isLogin && (
+            <p className="text-[10px] text-white/40 text-center mt-2">
+              İlk kez giriş yapıyorsanız lütfen önce hesabınızı doğrulayın.
+            </p>
+          )}
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">

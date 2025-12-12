@@ -66,6 +66,18 @@ export function UserView({ user }: UserViewProps) {
       }, 5000);
     }
 
+    if (selectedEvent) {
+      try {
+        await fetch("/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ eventId: selectedEvent._id }),
+        });
+      } catch (error) {
+        console.error("Failed to update reveal status:", error);
+      }
+    }
+
     setRevealed(true);
     for (let i = 0; i < randomInRange(10, 15); i++) {
       confetti({

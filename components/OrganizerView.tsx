@@ -10,13 +10,30 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/Card";
-import { Users, Plus, Trash2, Calendar, UserPlus, Shuffle } from "lucide-react";
+import {
+  Users,
+  Plus,
+  Trash2,
+  Calendar,
+  UserPlus,
+  Shuffle,
+  Eye,
+  CheckCircle2,
+} from "lucide-react";
 
 interface User {
   _id: string;
   username: string;
   name: string;
   role: string;
+  isActivated?: boolean;
+}
+
+interface Match {
+  giver: string;
+  receiver: string;
+  isRevealed: boolean;
+  giverRevealedDate?: string;
 }
 
 interface Event {
@@ -25,6 +42,7 @@ interface Event {
   giftLimit: number;
   giftDate?: string;
   status: string;
+  matches?: Match[];
 }
 
 export function OrganizerView() {
@@ -233,8 +251,11 @@ export function OrganizerView() {
                         {(user.name || user.username).charAt(0).toUpperCase()}
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-medium text-white leading-none">
+                        <span className="font-medium text-white leading-none flex items-center gap-1">
                           {user.name || user.username}
+                          {user.isActivated && (
+                            <CheckCircle2 className="w-3 h-3 text-green-400" />
+                          )}
                         </span>
                         <span className="text-[10px] text-white/50 font-mono mt-1">
                           {user.username}
@@ -439,55 +460,82 @@ export function OrganizerView() {
                   <div className="max-h-[200px] overflow-y-auto pr-2 space-y-1 border border-white/10 rounded p-2 bg-black/20">
                     {users
                       .filter((user) => user.role !== "ORGANIZER")
-                      .map((user) => (
-                        <div
-                          key={user._id}
-                          className="flex items-center gap-2 p-2 rounded hover:bg-white/5 cursor-pointer"
-                          onClick={() => {
-                            setSelectedParticipantIds((prev) =>
-                              prev.includes(user._id)
-                                ? prev.filter((id) => id !== user._id)
-                                : [...prev, user._id]
-                            );
-                          }}
-                        >
+                      .map((user) => {
+                        const match = selectedEvent.matches?.find(
+                          (m) => m.giver === user._id
+                        );
+
+                        return (
                           <div
-                            className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                              selectedParticipantIds.includes(user._id)
-                                ? "bg-green-500 border-green-500"
-                                : "border-white/30"
-                            }`}
+                            key={user._id}
+                            className="flex items-center gap-2 p-2 rounded hover:bg-white/5 cursor-pointer"
+                            onClick={() => {
+                              setSelectedParticipantIds((prev) =>
+                                prev.includes(user._id)
+                                  ? prev.filter((id) => id !== user._id)
+                                  : [...prev, user._id]
+                              );
+                            }}
                           >
-                            {selectedParticipantIds.includes(user._id) && (
-                              <svg
-                                className="w-3 h-3 text-white"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={3}
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            )}
+                            <div
+                              className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                                selectedParticipantIds.includes(user._id)
+                                  ? "bg-green-500 border-green-500"
+                                  : "border-white/30"
+                              }`}
+                            >
+                              {selectedParticipantIds.includes(user._id) && (
+                                <svg
+                                  className="w-3 h-3 text-white"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={3}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              )}
+                            </div>
+                            <div className="flex flex-col flex-1">
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`text-sm ${
+                                    selectedParticipantIds.includes(user._id)
+                                      ? "text-white"
+                                      : "text-white/60"
+                                  }`}
+                                >
+                                  {user.name}
+                                </span>
+                                {match?.giverRevealedDate && (
+                                  <span
+                                    className="text-[10px] text-green-400 bg-green-500/10 px-1 rounded flex items-center gap-1"
+                                    title="Eşleşmesini Gördü"
+                                  >
+                                    <Eye size={10} />
+                                    {new Date(
+                                      match.giverRevealedDate
+                                    ).toLocaleString("tr-TR", {
+                                      day: "2-digit",
+                                      month: "2-digit",
+                                      year: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[10px] text-white/50 font-mono mt-1">
+                                {user.username}
+                              </span>
+                            </div>
                           </div>
-                          <span
-                            className={`text-sm ${
-                              selectedParticipantIds.includes(user._id)
-                                ? "text-white"
-                                : "text-white/60"
-                            }`}
-                          >
-                            {user.name}
-                          </span>
-                          <span className="text-[10px] text-white/50 font-mono mt-1">
-                            {user.username}
-                          </span>
-                        </div>
-                      ))}
+                        );
+                      })}
                   </div>
                 </div>
 

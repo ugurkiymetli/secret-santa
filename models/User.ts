@@ -4,6 +4,7 @@ export interface IUser extends Document {
   username: string;
   name: string; // Real name of the user
   passwordHash?: string; // Optional because it's null until claimed
+  isActivated: boolean;
   role: "ORGANIZER" | "USER";
   createdAt: Date;
   updatedAt: Date;
@@ -14,6 +15,7 @@ const UserSchema: Schema = new Schema(
     username: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     passwordHash: { type: String, default: null },
+    isActivated: { type: Boolean, default: false },
     role: { type: String, enum: ["ORGANIZER", "USER"], default: "USER" },
   },
   { timestamps: true }
