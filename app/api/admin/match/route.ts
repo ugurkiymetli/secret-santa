@@ -19,7 +19,8 @@ export async function POST(req: Request) {
   }
 
   await dbConnect();
-  const { eventId } = await req.json();
+  const reqBody = await req.json();
+  const { eventId } = reqBody;
 
   if (!eventId) {
     return NextResponse.json({ error: 'Event ID required' }, { status: 400 });
@@ -30,10 +31,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
 
-  // Use all users for now, or we could add a participant selection step later.
-  // For simplicity, let's assume all users are participants in every event for now,
-  // OR we can just fetch all users and add them to the event participants list.
-  const participants = await User.find({ role: 'USER' });
+  // Determine participants
+  let participants;
+  
+  if (reqBody.participantIds && Array.isArray(reqBody.participantIds) && reqBody.participantIds.length > 0) {
+    // If specific participants were selected
+    participants = await User.find({ 
+      _id: { $in: reqBody.participantIds },
+      role: 'USER' // Ensure they are valid users
+    });
+  } else {
+    // Fallback to all users if no specific selection logic (or legacy behavior)
+    // Though the UI should now always send participantIds
+    participants = await User.find({ role: 'USER' });
+  }
 
   if (participants.length < 2) {
     return NextResponse.json({ error: 'Not enough participants (min 2)' }, { status: 400 });

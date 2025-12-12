@@ -17,7 +17,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   await dbConnect();
-  const events = await Event.find({}).sort({ createdAt: -1 });
+  const events = await Event.find({}).select('-matches').sort({ createdAt: -1 });
   return NextResponse.json({ events });
 }
 
@@ -42,6 +42,31 @@ export async function POST(req: Request) {
     status: 'ACTIVE'
   });
 console.log(event);
+
+  return NextResponse.json({ event });
+}
+
+export async function PUT(req: Request) {
+  if (!(await checkAdmin())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  await dbConnect();
+  const { id, giftLimit } = await req.json();
+
+  if (!id) {
+    return NextResponse.json({ error: 'ID required' }, { status: 400 });
+  }
+
+  const event = await Event.findByIdAndUpdate(
+    id,
+    { giftLimit: Number(giftLimit) },
+    { new: true }
+  );
+
+  if (!event) {
+    return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+  }
 
   return NextResponse.json({ event });
 }
