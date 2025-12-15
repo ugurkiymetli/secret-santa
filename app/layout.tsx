@@ -17,6 +17,32 @@ export const metadata: Metadata = {
   title: "Yılbaşı Çekilişi | Secret Santa",
   description:
     "Hediye çekilişinizi kolayca organize edin. Sevdiklerinizle hediyeleşmenin en eğlenceli yolu!",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "Yılbaşı Çekilişi | Secret Santa",
+    description:
+      "Hediye çekilişinizi kolayca organize edin. Sevdiklerinizle hediyeleşmenin en eğlenceli yolu!",
+    url: "https://secret-santa-app.vercel.app", // Replace with actual URL if known, or leave generic
+    siteName: "Secret Santa",
+    images: [
+      {
+        url: "/favicon.ico", // Using favicon as requested
+        width: 64, // Standard favicon size, though larger is better for OG
+        height: 64,
+      },
+    ],
+    locale: "tr_TR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Yılbaşı Çekilişi | Secret Santa",
+    description:
+      "Hediye çekilişinizi kolayca organize edin. Sevdiklerinizle hediyeleşmenin en eğlenceli yolu!",
+    images: ["/favicon.ico"],
+  },
 };
 
 export default function RootLayout({
