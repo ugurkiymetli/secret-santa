@@ -65,6 +65,7 @@ export function EventManagement({
     });
 
     if (res.ok) {
+      toast.success("Etkinlik silindi!");
       onRefresh();
     }
   };
