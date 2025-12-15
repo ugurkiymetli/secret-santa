@@ -3,10 +3,10 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IUser extends Document {
   username: string;
   name: string; // Real name of the user
-  passwordHash?: string; // Optional because it's null until claimed
+  passwordHash?: string | null; // Optional because it's null until claimed
   isActivated: boolean;
   role: "ORGANIZER" | "USER";
-  createdBy?: string; // ID of the organizer who created this user
+  createdBy?: string | null; // ID of the organizer who created this user
   createdAt: Date;
   updatedAt: Date;
 }

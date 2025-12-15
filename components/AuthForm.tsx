@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/Card";
-import { Gift, Eye, EyeOff, UserPlus } from "lucide-react";
+import { Gift, Eye, EyeOff } from "lucide-react";
 
 export function AuthForm() {
   const [mode, setMode] = useState<"LOGIN" | "CLAIM" | "REGISTER">("LOGIN");
