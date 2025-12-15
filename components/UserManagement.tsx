@@ -36,7 +36,7 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
   const getInviteText = (name: string, username: string) => {
     const emojis = ["🎄", "🎅", "🎁", "✨", "❄️", "⛄", "🦌", "🎉"];
     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    const loginLink = `${window.location.origin}/login`;
+    const loginLink = `${window.location.origin}`;
     const wishes = [
       "Mutlu yıllar! 🎁",
       "Yeni yılınız kutlu olsun! 🎉",
@@ -196,25 +196,25 @@ ${randomWish}
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-4 w-4 p-0 text-white/30 hover:text-white/80"
+                          className="h-6 w-6 p-0 text-white/30 hover:text-white/80"
                           onClick={() => handleShare(user.name, user.username)}
                           title="Davet et (Paylaş)"
                         >
-                          <Share className="h-3 w-3" />
+                          <Share className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-4 w-4 p-0 text-white/30 hover:text-white/80"
+                          className="h-6 w-6 p-0 text-white/30 hover:text-white/80"
                           onClick={() =>
                             handleCopy(user.name, user.username, user._id)
                           }
                           title="Davet et (Kopyala)"
                         >
                           {copiedUserId === user._id ? (
-                            <Check className="h-3 w-3 text-green-400" />
+                            <Check className="h-4 w-4 text-green-400" />
                           ) : (
-                            <Copy className="h-3 w-3" />
+                            <Copy className="h-4 w-4" />
                           )}
                         </Button>
                       </div>
