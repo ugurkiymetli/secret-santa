@@ -17,7 +17,7 @@ const UserSchema: Schema = new Schema(
     name: { type: String, required: true },
     passwordHash: { type: String, default: null },
     isActivated: { type: Boolean, default: false },
-    role: { type: String, enum: ["ORGANIZER", "USER"], default: "USER" },
+    role: { type: String, enum: ["ORGANIZER", "USER", "SUPER_ADMIN"], default: "USER" },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
   },
   { timestamps: true }
