@@ -11,7 +11,7 @@ export default function Footer() {
           className="flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-200"
         >
           <Linkedin className="w-5 h-5" />
-          <span className="text-sm font-medium hidden sm:inline">Need help?</span>
+          <span className="text-sm font-medium hidden sm:inline">Yardım mı?</span>
         </a>
         <a
           href="https://github.com/ugurkiymetli/secret-santa"
@@ -20,7 +20,7 @@ export default function Footer() {
           className="flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-200"
         >
           <Github className="w-5 h-5" />
-          <span className="text-sm font-medium hidden sm:inline">Check the code!</span>
+          <span className="text-sm font-medium hidden sm:inline">Kodu incele!</span>
         </a>
       </div>
     </footer>
