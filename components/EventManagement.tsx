@@ -81,14 +81,18 @@ export function EventManagement({
       </CardHeader>
       <CardContent>
         <form onSubmit={createEvent} className="flex flex-col gap-4 mb-6">
+          <label htmlFor="event-name">Etkinlik Adı</label>
           <Input
+            id="event-name"
             placeholder="Etkinlik Adı (örn. Ofis Partisi)"
             value={newEventName}
             onChange={(e) => setNewEventName(e.target.value)}
             className="w-full"
           />
           <div className="flex flex-col gap-4 md:flex-row">
+            <label htmlFor="gift-date">Etkinlik Tarihi</label>
             <Input
+              id="gift-date"
               type="date"
               value={giftDate}
               onChange={(e) => setGiftDate(e.target.value)}
