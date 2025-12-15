@@ -19,6 +19,7 @@ import {
   Copy,
   Check,
   Crown,
+  Link,
 } from "lucide-react";
 import { User } from "./types";
 import { toast } from "react-hot-toast";
@@ -71,6 +72,7 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
     toast.success(`${userToDelete.name}(${userToDelete.username}) silindi!`);
   };
 
+  console.log(process.env.NEXT_PUBLIC_URL);
   return (
     <Card className="border-white/10 shadow-white/5 h-fit">
       <CardHeader>
