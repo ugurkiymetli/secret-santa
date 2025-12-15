@@ -17,13 +17,12 @@ import {
   UserPlus,
   Trash2,
   CheckCircle2,
-  Copy,
   Check,
-  Crown,
+  Share,
+  Copy,
 } from "lucide-react";
 import { User } from "./types";
 import { toast } from "react-hot-toast";
-import { span } from "framer-motion/client";
 
 interface UserManagementProps {
   users: User[];
@@ -34,13 +33,7 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
   const [newUser, setNewUser] = useState("");
   const [copiedUserId, setCopiedUserId] = useState<string | null>(null);
 
-  const handleCopyUsernameAndLoginLink = (
-    name: string,
-    username: string,
-    userId: string
-  ) => {
-    if (typeof window === "undefined") return;
-
+  const getInviteText = (name: string, username: string) => {
     const emojis = ["🎄", "🎅", "🎁", "✨", "❄️", "⛄", "🦌", "🎉"];
     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
     const loginLink = `${window.location.origin}/login`;
@@ -53,7 +46,7 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
     ];
     const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
 
-    const text = `Selam ${name}! ${randomEmoji}
+    return `Selam ${name}! ${randomEmoji}
 
 Seni de yılbaşı çekilişimize bekliyoruz! 🥳
 
@@ -66,6 +59,38 @@ Aşağıdaki linkten giriş yapabilirsin, unutma ilk girişte hesabını aktifle
 ${randomWish}
 
 `;
+  };
+
+  const handleShare = async (name: string, username: string) => {
+    if (typeof window === "undefined") return;
+
+    const text = getInviteText(name, username);
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Yılbaşı Çekilişi Daveti",
+          text: text,
+        });
+        toast.success("Davet paylaşıldı!");
+      } catch (error) {
+        if ((error as Error).name !== "AbortError") {
+          console.error("Share failed:", error);
+          // Fallback to clipboard if share fails unexpectedly
+          navigator.clipboard.writeText(text);
+          toast.success("Davet mesajı kopyalandı!");
+        }
+      }
+    } else {
+      // Fallback for desktop users who might click "Share"
+      navigator.clipboard.writeText(text);
+      toast.success("Davet mesajı kopyalandı! (Paylaşım desteklenmiyor)");
+    }
+  };
+
+  const handleCopy = (name: string, username: string, userId: string) => {
+    if (typeof window === "undefined") return;
+    const text = getInviteText(name, username);
     navigator.clipboard.writeText(text);
     setCopiedUserId(userId);
     setTimeout(() => setCopiedUserId(null), 2000);
@@ -172,14 +197,19 @@ ${randomWish}
                           variant="ghost"
                           size="sm"
                           className="h-4 w-4 p-0 text-white/30 hover:text-white/80"
+                          onClick={() => handleShare(user.name, user.username)}
+                          title="Davet et (Paylaş)"
+                        >
+                          <Share className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-4 w-4 p-0 text-white/30 hover:text-white/80"
                           onClick={() =>
-                            handleCopyUsernameAndLoginLink(
-                              user.name,
-                              user.username,
-                              user._id
-                            )
+                            handleCopy(user.name, user.username, user._id)
                           }
-                          title="Davet metnini kopyala"
+                          title="Davet et (Kopyala)"
                         >
                           {copiedUserId === user._id ? (
                             <Check className="h-3 w-3 text-green-400" />
