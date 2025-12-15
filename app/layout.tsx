@@ -45,6 +45,8 @@ export const metadata: Metadata = {
   },
 };
 
+import Footer from "@/components/Footer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -53,9 +55,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased pb-20`}
       >
         {children}
+        <Footer />
         <Toaster
           position="top-center"
           toastOptions={{
@@ -85,3 +88,4 @@ export default function RootLayout({
     </html>
   );
 }
+
