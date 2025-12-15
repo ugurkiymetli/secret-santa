@@ -84,27 +84,39 @@ export function EventManagement({
       </CardHeader>
       <CardContent>
         <form onSubmit={createEvent} className="flex flex-col gap-4 mb-6">
-          <label htmlFor="event-name">Etkinlik Adı</label>
-          <Input
-            id="event-name"
-            placeholder="Etkinlik Adı (örn. Ofis Partisi)"
-            value={newEventName}
-            onChange={(e) => setNewEventName(e.target.value)}
-            className="w-full"
-          />
-          <div className="flex flex-col gap-4 md:flex-row">
-            <label htmlFor="gift-date">Etkinlik Tarihi</label>
+          <div>
+            <label
+              htmlFor="event-name"
+              className="block mb-1 text-sm font-medium text-white/80"
+            >
+              Etkinlik Adı
+            </label>
+            <Input
+              id="event-name"
+              placeholder="Etkinlik Adı (örn. Ofis Partisi)"
+              value={newEventName}
+              onChange={(e) => setNewEventName(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="gift-date"
+              className="block mb-1 text-sm font-medium text-white/80"
+            >
+              Etkinlik Tarihi
+            </label>
             <Input
               id="gift-date"
               type="date"
               value={giftDate}
               onChange={(e) => setGiftDate(e.target.value)}
-              className="w-full md:w-auto md:flex-1"
+              className="w-full"
             />
-            <Button type="submit" className="w-full md:w-auto">
-              <Plus className="w-4 h-4 mr-2" /> Oluştur
-            </Button>
           </div>
+          <Button type="submit" className="w-full">
+            <Plus className="w-4 h-4 mr-2" /> Oluştur
+          </Button>
         </form>
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-white/80 mb-2">

@@ -46,7 +46,8 @@ export default async function Dashboard() {
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm text-slate-400 hidden md:inline">
-            Hoşgeldin, <span className="text-slate-200">{user.username}</span>
+            Hoşgeldin,
+            <span className="text-slate-200">{user.username}</span>
           </span>
           <LogoutButton />
         </div>

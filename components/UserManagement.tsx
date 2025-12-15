@@ -192,9 +192,6 @@ ${randomWish}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs px-2 py-1 rounded bg-white/10 text-white/80 flex items-center gap-1">
-                      {user.role === "ORGANIZER" && (
-                        <Crown className="w-3 h-3 text-yellow-500" />
-                      )}
                       {user.role === "ORGANIZER" ? "ORGANİZATÖR" : "KATILIMCI"}
                     </span>
                     {user.role !== "ORGANIZER" && (
@@ -203,6 +200,7 @@ ${randomWish}
                         size="sm"
                         className="h-6 w-6 p-0 text-red-400 bg-red-900/20 hover:bg-red-900/40"
                         onClick={() => deleteUser(user)}
+                        title="Kullanıcıyı sil"
                       >
                         <Trash2 className="w-3 h-3" />
                       </Button>
