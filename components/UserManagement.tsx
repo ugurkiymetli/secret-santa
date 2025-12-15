@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/purity */
 "use client";
 
 import { useState } from "react";
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 import { User } from "./types";
 import { toast } from "react-hot-toast";
+import { span } from "framer-motion/client";
 
 interface UserManagementProps {
   users: User[];
@@ -32,10 +34,42 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
   const [newUser, setNewUser] = useState("");
   const [copiedUserId, setCopiedUserId] = useState<string | null>(null);
 
-  const handleCopyUsername = (username: string, userId: string) => {
-    navigator.clipboard.writeText(username);
+  const handleCopyUsernameAndLoginLink = (
+    name: string,
+    username: string,
+    userId: string
+  ) => {
+    if (typeof window === "undefined") return;
+
+    const emojis = ["🎄", "🎅", "🎁", "✨", "❄️", "⛄", "🦌", "🎉"];
+    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    const loginLink = `${window.location.origin}/login`;
+    const wishes = [
+      "Mutlu yıllar! 🎁",
+      "Yeni yılınız kutlu olsun! 🎉",
+      "Harika bir yıl dileriz! ✨",
+      "Umut dolu bir yıl olsun! 🥳",
+      "Sağlık, mutluluk ve başarılarla dolu bir yıl olsun! 🎄",
+    ];
+    const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
+
+    const text = `Selam ${name}! ${randomEmoji}
+
+Seni de yılbaşı çekilişimize bekliyoruz! 🥳
+
+Senin için oluşturduğumuz kullanıcı adı: 
+    ${username}
+
+Aşağıdaki linkten giriş yapabilirsin, unutma ilk girişte hesabını aktifleştirmen gerekiyor:
+    ${loginLink}
+
+${randomWish}
+
+`;
+    navigator.clipboard.writeText(text);
     setCopiedUserId(userId);
     setTimeout(() => setCopiedUserId(null), 2000);
+    toast.success("Davet mesajı kopyalandı!");
   };
 
   const createUser = async (e: React.FormEvent) => {
@@ -125,7 +159,9 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
                       <span className="font-medium text-white leading-none flex items-center gap-1">
                         {user.name || user.username}
                         {user.isActivated && (
-                          <CheckCircle2 className="w-3 h-3 text-green-400" />
+                          <span title="Kullanıcı aktif">
+                            <CheckCircle2 className="w-3 h-3 text-green-400" />
+                          </span>
                         )}
                       </span>
                       <div className="flex items-center gap-1 mt-1 group/copy">
@@ -137,9 +173,13 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
                           size="sm"
                           className="h-4 w-4 p-0 text-white/30 hover:text-white/80"
                           onClick={() =>
-                            handleCopyUsername(user.username, user._id)
+                            handleCopyUsernameAndLoginLink(
+                              user.name,
+                              user.username,
+                              user._id
+                            )
                           }
-                          title="Kullanıcı adını kopyala"
+                          title="Davet metnini kopyala"
                         >
                           {copiedUserId === user._id ? (
                             <Check className="h-3 w-3 text-green-400" />

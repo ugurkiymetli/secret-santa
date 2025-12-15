@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster
-          position="bottom-right"
+          position="top-center"
           toastOptions={{
             style: {
               background: "rgba(0, 0, 0, 0.4)",
