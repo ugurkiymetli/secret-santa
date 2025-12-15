@@ -72,7 +72,7 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
     toast.success(`${userToDelete.name}(${userToDelete.username}) silindi!`);
   };
 
-  console.log(process.env.NEXT_PUBLIC_URL);
+  console.log(`${window.location.origin}/login`);
   return (
     <Card className="border-white/10 shadow-white/5 h-fit">
       <CardHeader>
