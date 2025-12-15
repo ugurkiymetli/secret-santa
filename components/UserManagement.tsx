@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   Copy,
   Check,
+  Crown,
 } from "lucide-react";
 import { User } from "./types";
 import { toast } from "react-hot-toast";
@@ -117,6 +118,7 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
                             .split(" ")
                             .map((word) => word.charAt(0).toUpperCase())
                             .join("")
+                            .slice(0, 3)
                         : user.username.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex flex-col">
@@ -149,7 +151,10 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 rounded bg-white/10 text-white/80">
+                    <span className="text-xs px-2 py-1 rounded bg-white/10 text-white/80 flex items-center gap-1">
+                      {user.role === "ORGANIZER" && (
+                        <Crown className="w-3 h-3 text-yellow-500" />
+                      )}
                       {user.role === "ORGANIZER" ? "ORGANİZATÖR" : "KATILIMCI"}
                     </span>
                     {user.role !== "ORGANIZER" && (

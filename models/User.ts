@@ -6,6 +6,7 @@ export interface IUser extends Document {
   passwordHash?: string; // Optional because it's null until claimed
   isActivated: boolean;
   role: "ORGANIZER" | "USER";
+  createdBy?: string; // ID of the organizer who created this user
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,6 +18,7 @@ const UserSchema: Schema = new Schema(
     passwordHash: { type: String, default: null },
     isActivated: { type: Boolean, default: false },
     role: { type: String, enum: ["ORGANIZER", "USER"], default: "USER" },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
   },
   { timestamps: true }
 );

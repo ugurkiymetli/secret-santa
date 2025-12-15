@@ -16,8 +16,15 @@ export async function GET() {
   if (!(await checkAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  const payload: any = await verifyToken(token!);
+
   await dbConnect();
-  const events = await Event.find({})
+
+  // Filter by organizerId to ensure isolation
+  const events = await Event.find({ organizerId: payload.userId })
     .select("-matches.receiver")
     .sort({ createdAt: -1 });
   return NextResponse.json({ events });
@@ -60,14 +67,22 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: "ID required" }, { status: 400 });
   }
 
-  const event = await Event.findByIdAndUpdate(
-    id,
+  // Ensure event belongs to this organizer
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  const payload: any = await verifyToken(token!);
+
+  const event = await Event.findOneAndUpdate(
+    { _id: id, organizerId: payload.userId },
     { giftLimit: Number(giftLimit) },
     { new: true }
   );
 
   if (!event) {
-    return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Event not found or unauthorized" },
+      { status: 404 }
+    );
   }
 
   return NextResponse.json({ event });
@@ -86,6 +101,21 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "ID required" }, { status: 400 });
   }
 
-  await Event.findByIdAndDelete(id);
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  const payload: any = await verifyToken(token!);
+
+  const deletedEvent = await Event.findOneAndDelete({
+    _id: id,
+    organizerId: payload.userId,
+  });
+
+  if (!deletedEvent) {
+    return NextResponse.json(
+      { error: "Event not found or unauthorized" },
+      { status: 404 }
+    );
+  }
+
   return NextResponse.json({ success: true });
 }

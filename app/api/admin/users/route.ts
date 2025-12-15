@@ -19,8 +19,21 @@ export async function GET() {
   if (!(await checkAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  const payload: any = await verifyToken(token!);
+
   await dbConnect();
-  const users = await User.find({}).select("-passwordHash -assignedMatch");
+  // Show users created by this admin, OR the admin themselves (optional, but good for "My Profile" context if we had one)
+  // For UserManagement list, usually we only want to see participants managed by this admin.
+  // We'll filter by { createdBy: payload.userId } covers participants.
+  // NOTE: If we want to show the admin in the list too, we can add $or: [{_id: payload.userId}]
+  // But usually admin manages *others*. Let's stick to createdBy for now.
+
+  const users = await User.find({ createdBy: payload.userId }).select(
+    "-passwordHash -assignedMatch"
+  );
   return NextResponse.json({ users });
 }
 
@@ -46,6 +59,20 @@ export async function DELETE(req: Request) {
     return NextResponse.json(
       { error: "Cannot delete yourself" },
       { status: 400 }
+    );
+  }
+
+  // Ensure the user to act on belongs to this admin
+  const userToDelete = await User.findById(id);
+  if (!userToDelete) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  // Allow deleting only if created by this admin
+  if (userToDelete.createdBy?.toString() !== payload.userId) {
+    return NextResponse.json(
+      { error: "Unauthorized to delete this user" },
+      { status: 403 }
     );
   }
 
@@ -103,10 +130,17 @@ export async function POST(req: Request) {
       );
     }
 
+    // Get admin ID
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+    const payload: any = await verifyToken(token!);
+
     const newUser = await User.create({
       name,
       username,
       role: role || "USER",
+      createdBy: payload.userId, // Link to creator
+      isActivated: false, // Created users need to claim
     });
     return NextResponse.json({ user: newUser });
   } catch (error: any) {

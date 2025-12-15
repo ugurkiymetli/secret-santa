@@ -12,11 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/Card";
-import { Gift, Eye, EyeOff } from "lucide-react";
+import { Gift, Eye, EyeOff, UserPlus } from "lucide-react";
 
 export function AuthForm() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<"LOGIN" | "CLAIM" | "REGISTER">("LOGIN");
   const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +31,7 @@ export function AuthForm() {
     setLoading(true);
 
     try {
-      if (!isLogin) {
+      if (mode !== "LOGIN") {
         if (password.length < 6) {
           setError("Şifre en az 6 karakter olmalıdır.");
           setLoading(false);
@@ -43,29 +44,40 @@ export function AuthForm() {
         }
       }
 
-      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/claim";
+      let endpoint = "/api/auth/login";
+      let body: any = { username, password };
+
+      if (mode === "CLAIM") {
+        endpoint = "/api/auth/claim";
+      } else if (mode === "REGISTER") {
+        endpoint = "/api/auth/register";
+        body = { ...body, name };
+      }
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
         if (data.error === "Account not claimed. Please claim your account.") {
-          setIsLogin(false);
+          setMode("CLAIM");
           setError("Lütfen şifre belirlemek için hesabınızı doğrulayın.");
         } else if (data.error === "Account already claimed. Please login.") {
-          setIsLogin(true);
+          setMode("LOGIN");
           setError("Hesap zaten doğrulanmış. Lütfen giriş yapın.");
         } else {
           const errorMap: Record<string, string> = {
             "User not found": "Kullanıcı bulunamadı",
             "Invalid credentials": "Kullanıcı adı veya şifre hatalı",
             "Internal server error": "Sunucu hatası",
+            "Username already exists": "Bu kullanıcı adı zaten alınmış",
+            "Missing required fields": "Tüm alanları doldurun",
           };
-          setError(errorMap[data.error] || "Bir hata oluştu");
+          setError(errorMap[data.error] || data.error || "Bir hata oluştu");
         }
       } else {
         router.push("/dashboard");
@@ -85,17 +97,65 @@ export function AuthForm() {
             <Gift className="w-8 h-8 text-white" />
           </div>
         </div>
+
         <CardTitle className="text-center">Yılbaşı Çekilişi</CardTitle>
         <CardDescription className="text-center">
-          {isLogin
+          {mode === "LOGIN"
             ? "Giriş yapmak için bilgilerinizi girin"
-            : "Hesabınızı doğrulayın ve şifre belirleyin"}
+            : mode === "CLAIM"
+            ? "Hesabınızı doğrulayın ve şifre belirleyin"
+            : "Yeni bir organizatör hesabı oluşturun"}
         </CardDescription>
+        <div className="flex gap-2 justify-center mt-4 bg-white/5 p-1 rounded-lg">
+          <button
+            onClick={() => setMode("LOGIN")}
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+              mode === "LOGIN"
+                ? "bg-white text-black"
+                : "text-white/60 hover:text-white"
+            }`}
+          >
+            Giriş Yap
+          </button>
+          <button
+            onClick={() => setMode("REGISTER")}
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+              mode === "REGISTER"
+                ? "bg-white text-black"
+                : "text-white/60 hover:text-white"
+            }`}
+          >
+            Organizatör Ol
+          </button>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit}>
           <div className="grid w-full items-center gap-4">
+            {mode === "REGISTER" && (
+              <div className="flex flex-col space-y-1.5">
+                <label
+                  className="text-sm font-medium text-white/80"
+                  htmlFor="name"
+                >
+                  Ad Soyad
+                </label>
+                <Input
+                  id="name"
+                  placeholder="Adınız Soyadınız"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+            )}
             <div className="flex flex-col space-y-1.5">
+              <label
+                className="text-sm font-medium text-white/80"
+                htmlFor="username"
+              >
+                Kullanıcı Adı
+              </label>
               <Input
                 id="username"
                 placeholder="Kullanıcı Adı"
@@ -105,28 +165,42 @@ export function AuthForm() {
               />
             </div>
             <div className="flex flex-col space-y-1.5 relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder={isLogin ? "Şifre" : "Yeni Şifre Belirle"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+              <label
+                className="text-sm font-medium text-white/80"
+                htmlFor="password"
               >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
+                {mode === "LOGIN" ? "Şifre" : "Şifre Belirle"}
+              </label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder={mode === "LOGIN" ? "Şifre" : "Şifre Belirle"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
-            {!isLogin && (
+            {mode !== "LOGIN" && (
               <div className="flex flex-col space-y-1.5 relative">
+                <label
+                  className="text-sm font-medium text-white/80"
+                  htmlFor="confirmPassword"
+                >
+                  Şifreyi Onayla
+                </label>
                 <Input
                   id="confirmPassword"
                   type={showPassword ? "text" : "password"}
@@ -146,28 +220,52 @@ export function AuthForm() {
           <Button className="w-full mt-6" type="submit" disabled={loading}>
             {loading
               ? "Yükleniyor..."
-              : isLogin
+              : mode === "LOGIN"
               ? "Giriş Yap"
+              : mode === "REGISTER"
+              ? "Kayıt Ol"
               : "Hesabı Doğrula"}
           </Button>
-          {isLogin && (
+          {(mode === "LOGIN" || mode === "CLAIM") && (
             <p className="text-[10px] text-white/40 text-center mt-2">
-              İlk kez giriş yapıyorsanız lütfen önce hesabınızı doğrulayın.
+              {mode === "LOGIN"
+                ? "Katılımcı hesabınızı doğrulamak için aşağıya tıklayın."
+                : "Şifrenizi belirledikten sonra giriş yapabilirsiniz."}
             </p>
           )}
         </form>
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsLogin(!isLogin)}
-          className="text-xs text-white/50 hover:text-white"
-        >
-          {isLogin
-            ? "Hesabınızı doğrulamanız mı gerekiyor?"
-            : "Zaten hesabınız var mı?"}
-        </Button>
+      <CardFooter className="flex justify-center flex-col gap-2">
+        {mode === "LOGIN" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setMode("CLAIM")}
+            className="text-xs text-white/50 hover:text-white"
+          >
+            Katılımcı hesabını doğrula
+          </Button>
+        )}
+        {mode === "CLAIM" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setMode("LOGIN")}
+            className="text-xs text-white/50 hover:text-white"
+          >
+            Giriş ekranına dön
+          </Button>
+        )}
+        {mode === "REGISTER" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setMode("LOGIN")}
+            className="text-xs text-white/50 hover:text-white"
+          >
+            Zaten hesabınız var mı? Giriş Yap
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );
