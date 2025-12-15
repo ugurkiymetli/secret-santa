@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/Card";
 import { Plus, Trash2 } from "lucide-react";
 import { Event } from "./types";
+import toast from "react-hot-toast";
 
 interface EventManagementProps {
   events: Event[];
@@ -47,6 +48,7 @@ export function EventManagement({
       setNewEventName("");
       setGiftDate("");
       onRefresh();
+      toast.success("Etkinlik oluşturuldu!");
     }
   };
 

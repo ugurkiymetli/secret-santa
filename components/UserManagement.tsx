@@ -19,6 +19,7 @@ import {
   Check,
 } from "lucide-react";
 import { User } from "./types";
+import { toast } from "react-hot-toast";
 
 interface UserManagementProps {
   users: User[];
@@ -48,6 +49,7 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
     if (res.ok) {
       setNewUser("");
       onRefresh();
+      toast.success("Yeni katılımcı eklendi!");
     }
   };
 
@@ -57,6 +59,7 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
         method: "DELETE",
       });
       onRefresh();
+      toast.success(`${user.name}(${user.username}) silindi!`);
     }
   };
 
@@ -81,74 +84,81 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
           </Button>
         </form>
         <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
-          {users.map((user, index) => {
-            const colors = [
-              "bg-red-500",
-              "bg-green-500",
-              "bg-emerald-500",
-              "bg-blue-500",
-              "bg-purple-500",
-            ];
-            const color = colors[index % colors.length];
+          {users
+            .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+            .map((user, index) => {
+              const colors = [
+                "bg-red-500",
+                "bg-green-500",
+                "bg-emerald-500",
+                "bg-blue-500",
+                "bg-purple-500",
+              ];
+              const color = colors[index % colors.length];
 
-            return (
-              <div
-                key={user._id}
-                className="flex items-center justify-between p-2 rounded bg-black/20 border border-white/10 group hover:bg-black/30 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-8 h-8 rounded-full ${color} flex items-center justify-center text-white font-bold text-xs shadow-lg ring-2 ring-white/20`}
-                  >
-                    {(user.name || user.username).charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-medium text-white leading-none flex items-center gap-1">
-                      {user.name || user.username}
-                      {user.isActivated && (
-                        <CheckCircle2 className="w-3 h-3 text-green-400" />
-                      )}
-                    </span>
-                    <div className="flex items-center gap-1 mt-1 group/copy">
-                      <span className="text-[10px] text-white/50 font-mono">
-                        {user.username}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-4 w-4 p-0 text-white/30 hover:text-white/80"
-                        onClick={() =>
-                          handleCopyUsername(user.username, user._id)
-                        }
-                        title="Kullanıcı adını kopyala"
-                      >
-                        {copiedUserId === user._id ? (
-                          <Check className="h-3 w-3 text-green-400" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
+              return (
+                <div
+                  key={user._id}
+                  className="flex items-center justify-between p-2 rounded bg-black/20 border border-white/10 group hover:bg-black/30 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-8 h-8 rounded-full ${color} flex items-center justify-center text-white font-bold text-xs shadow-lg ring-2 ring-white/20`}
+                    >
+                      {user.name
+                        ? user.name
+                            .split(" ")
+                            .map((word) => word.charAt(0).toUpperCase())
+                            .join("")
+                        : user.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-white leading-none flex items-center gap-1">
+                        {user.name || user.username}
+                        {user.isActivated && (
+                          <CheckCircle2 className="w-3 h-3 text-green-400" />
                         )}
-                      </Button>
+                      </span>
+                      <div className="flex items-center gap-1 mt-1 group/copy">
+                        <span className="text-[10px] text-white/50 font-mono">
+                          {user.username}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-4 w-4 p-0 text-white/30 hover:text-white/80"
+                          onClick={() =>
+                            handleCopyUsername(user.username, user._id)
+                          }
+                          title="Kullanıcı adını kopyala"
+                        >
+                          {copiedUserId === user._id ? (
+                            <Check className="h-3 w-3 text-green-400" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-2 py-1 rounded bg-white/10 text-white/80">
+                      {user.role === "ORGANIZER" ? "ORGANİZATÖR" : "KATILIMCI"}
+                    </span>
+                    {user.role !== "ORGANIZER" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-6 w-6 p-0 text-red-400 bg-red-900/20 hover:bg-red-900/40"
+                        onClick={() => deleteUser(user)}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs px-2 py-1 rounded bg-white/10 text-white/80">
-                    {user.role === "ORGANIZER" ? "ORGANİZATÖR" : "KATILIMCI"}
-                  </span>
-                  {user.role !== "ORGANIZER" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-6 w-6 p-0 text-red-400 bg-red-900/20 hover:bg-red-900/40"
-                      onClick={() => deleteUser(user)}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
           {users.length === 0 && (
             <p className="text-center text-white/50 py-4">
               Henüz katılımcı yok

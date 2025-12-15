@@ -11,6 +11,7 @@ import {
   CardDescription,
 } from "@/components/ui/Card";
 import { Calendar, Shuffle, Eye } from "lucide-react";
+import { toast } from "react-hot-toast";
 import { Event, User } from "./types";
 
 interface EventDetailsProps {
@@ -35,14 +36,12 @@ export function EventDetails({
     selectedEvent.giftLimit.toString()
   );
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   // Sync state when event changes
   useEffect(() => {
     const limit = selectedEvent.giftLimit.toString();
     setGiftLimit(limit);
     setInitialGiftLimit(limit);
-    setMessage("");
 
     if (selectedEvent.matches && selectedEvent.matches.length > 0) {
       setSelectedParticipantIds(selectedEvent.matches.map((m) => m.giver));
@@ -68,19 +67,19 @@ export function EventDetails({
     if (res.ok) {
       setInitialGiftLimit(giftLimit);
       onRefresh(); // To update the list state as well
-      setMessage("Hediye limiti güncellendi!");
-      setTimeout(() => setMessage(""), 3000);
+      toast.success("Hediye limiti güncellendi!");
     }
   };
 
   const handleMatch = async () => {
     if (!selectedEvent._id) return;
-    if (
-      !confirm(
-        "Emin misiniz? Bu işlem bu etkinlik için eşleşmeleri karıştıracaktır."
-      )
-    )
-      return;
+    const isReshuffle =
+      selectedEvent.matches && selectedEvent.matches.length > 0;
+    const confirmMessage = isReshuffle
+      ? "DİKKAT: Bu etkinlikte zaten yapılmış bir eşleşme var. Yeniden eşleştirmek mevcut eşleşmeleri SİLECEKTİR. Devam etmek istiyor musunuz?"
+      : "Eşleşmeleri başlatmak üzeresiniz. Onaylıyor musunuz?";
+
+    if (!confirm(confirmMessage)) return;
 
     setLoading(true);
     const res = await fetch("/api/admin/match", {
@@ -96,10 +95,10 @@ export function EventDetails({
     setLoading(false);
 
     if (res.ok) {
-      setMessage(`${data.count} katılımcı başarıyla eşleştirildi!`);
+      toast.success(`${data.count} katılımcı başarıyla eşleştirildi!`);
       onRefresh(); // Refresh status
     } else {
-      setMessage(`Hata: ${data.error}`);
+      toast.error(`Hata: ${data.error}`);
     }
   };
 
@@ -262,24 +261,50 @@ export function EventDetails({
         </div>
 
         <Button
-          className="w-full"
+          className={`w-full ${
+            selectedEvent.matches && selectedEvent.matches.length > 0
+              ? "bg-red-600 hover:bg-red-700 text-white"
+              : ""
+          }`}
           onClick={handleMatch}
           disabled={loading || selectedParticipantIds.length < 2}
         >
           <Shuffle className="w-4 h-4 mr-2" />
-          {loading ? "Eşleştiriliyor..." : "Çekilişi Başlat"}
+          {loading
+            ? "Eşleştiriliyor..."
+            : selectedEvent.matches && selectedEvent.matches.length > 0
+            ? "Yeniden Eşleştir"
+            : "Çekilişi Başlat"}
         </Button>
 
-        {message && (
-          <p className="text-center text-sm font-medium text-green-400 animate-pulse">
-            {message}
-          </p>
-        )}
         <div className="p-4 rounded bg-white/5 border border-white/10 text-xs text-white/60">
           <p className="font-bold mb-1">⚠️ Önemli</p>
-          Çekilişi başlatmak <strong>{selectedEvent.name}</strong> etkinliği
-          için seçili kişiler ({selectedParticipantIds.length}) arasında
-          eşleşmeleri yapacaktır.
+          {selectedEvent.matches && selectedEvent.matches.length > 0 ? (
+            <span>
+              Bu etkinlik için <strong>zaten eşleşme yapılmış</strong>. Yeniden
+              eşleştirmek mevcut eşleşmeleri <strong>silecek</strong> ve yeni
+              eşleşmeler oluşturacaktır.
+            </span>
+          ) : (
+            <>
+              <span>
+                Çekilişi başlatmak <strong>{selectedEvent.name}</strong>{" "}
+                etkinliği için seçili kişiler ({selectedParticipantIds.length})
+                arasında eşleşmeleri yapacaktır.
+                <br />
+                {selectedParticipantIds.length > 0 && (
+                  <span>
+                    Katılımcılar:{" "}
+                    {users
+                      .filter((u) => selectedParticipantIds.includes(u._id))
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((u) => u.name)
+                      .join(", ")}
+                  </span>
+                )}
+              </span>
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
