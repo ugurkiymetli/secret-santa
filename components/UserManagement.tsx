@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import {
   Card,
   CardContent,
@@ -53,14 +54,20 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
     }
   };
 
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+
   const deleteUser = async (user: User) => {
-    if (confirm(`${user.username} silinsin mi?`)) {
-      await fetch(`/api/admin/users?id=${user._id}`, {
-        method: "DELETE",
-      });
-      onRefresh();
-      toast.success(`${user.name}(${user.username}) silindi!`);
-    }
+    setUserToDelete(user);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+
+    await fetch(`/api/admin/users?id=${userToDelete._id}`, {
+      method: "DELETE",
+    });
+    onRefresh();
+    toast.success(`${userToDelete.name}(${userToDelete.username}) silindi!`);
   };
 
   return (
@@ -166,6 +173,16 @@ export function UserManagement({ users, onRefresh }: UserManagementProps) {
           )}
         </div>
       </CardContent>
+
+      <ConfirmationModal
+        isOpen={!!userToDelete}
+        onClose={() => setUserToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Katılımcıyı Sil"
+        message={`${userToDelete?.name} (${userToDelete?.username}) silinsin mi?`}
+        variant="danger"
+        confirmText="Sil"
+      />
     </Card>
   );
 }

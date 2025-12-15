@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import {
   Card,
   CardContent,
@@ -71,16 +72,14 @@ export function EventDetails({
     }
   };
 
-  const handleMatch = async () => {
+  const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
+
+  const handleMatch = () => {
     if (!selectedEvent._id) return;
-    const isReshuffle =
-      selectedEvent.matches && selectedEvent.matches.length > 0;
-    const confirmMessage = isReshuffle
-      ? "DİKKAT: Bu etkinlikte zaten yapılmış bir eşleşme var. Yeniden eşleştirmek mevcut eşleşmeleri SİLECEKTİR. Devam etmek istiyor musunuz?"
-      : "Eşleşmeleri başlatmak üzeresiniz. Onaylıyor musunuz?";
+    setIsMatchModalOpen(true);
+  };
 
-    if (!confirm(confirmMessage)) return;
-
+  const performMatch = async () => {
     setLoading(true);
     const res = await fetch("/api/admin/match", {
       method: "POST",
@@ -307,6 +306,32 @@ export function EventDetails({
           )}
         </div>
       </CardContent>
+
+      <ConfirmationModal
+        isOpen={isMatchModalOpen}
+        onClose={() => setIsMatchModalOpen(false)}
+        onConfirm={performMatch}
+        title={
+          selectedEvent.matches && selectedEvent.matches.length > 0
+            ? "Yeniden Eşleştir"
+            : "Eşleşmeleri Başlat"
+        }
+        message={
+          selectedEvent.matches && selectedEvent.matches.length > 0
+            ? "DİKKAT: Bu etkinlikte zaten yapılmış bir eşleşme var. Yeniden eşleştirmek mevcut eşleşmeleri SİLECEKTİR. Devam etmek istiyor musunuz?"
+            : "Eşleşmeleri başlatmak üzeresiniz. Onaylıyor musunuz?"
+        }
+        confirmText={
+          selectedEvent.matches && selectedEvent.matches.length > 0
+            ? "Yeniden Eşleştir"
+            : "Başlat"
+        }
+        variant={
+          selectedEvent.matches && selectedEvent.matches.length > 0
+            ? "danger"
+            : "default"
+        }
+      />
     </Card>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import {
   Card,
   CardContent,
@@ -52,15 +53,16 @@ export function EventManagement({
     }
   };
 
-  const deleteEvent = async (id: string) => {
-    if (
-      !confirm(
-        "Bu etkinliği silmek istediğinize emin misiniz? Eşleşmeler kaybolacaktır."
-      )
-    )
-      return;
+  const [eventToDeleteId, setEventToDeleteId] = useState<string | null>(null);
 
-    const res = await fetch(`/api/admin/events?id=${id}`, {
+  const deleteEvent = (id: string) => {
+    setEventToDeleteId(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!eventToDeleteId) return;
+
+    const res = await fetch(`/api/admin/events?id=${eventToDeleteId}`, {
       method: "DELETE",
     });
 
@@ -68,6 +70,7 @@ export function EventManagement({
       toast.success("Etkinlik silindi!");
       onRefresh();
     }
+    setEventToDeleteId(null);
   };
 
   return (
@@ -147,6 +150,16 @@ export function EventManagement({
           ))}
         </div>
       </CardContent>
+
+      <ConfirmationModal
+        isOpen={!!eventToDeleteId}
+        onClose={() => setEventToDeleteId(null)}
+        onConfirm={handleConfirmDelete}
+        title="Etkinliği Sil"
+        message="Bu etkinliği silmek istediğinize emin misiniz? Eşleşmeler kaybolacaktır."
+        variant="danger"
+        confirmText="Sil"
+      />
     </Card>
   );
 }
