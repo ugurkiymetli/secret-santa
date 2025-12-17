@@ -82,6 +82,7 @@ export async function POST(req: Request) {
   event.participants = participants.map((p) => p._id);
   event.matches = matches;
   event.status = "ACTIVE";
+  event.matchDate = new Date();
   await event.save();
 
   return NextResponse.json({ success: true, count: participants.length });

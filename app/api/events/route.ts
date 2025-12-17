@@ -40,6 +40,7 @@ export async function GET() {
         giftLimit: event.giftLimit,
         giftDate: event.giftDate,
         matchName: match?.receiver?.name || null,
+        matchDate: event.matchDate,
       };
     });
 

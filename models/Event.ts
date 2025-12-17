@@ -17,6 +17,7 @@ export interface IEvent extends Document {
   matches: IMatch[];
   createdAt: Date;
   updatedAt: Date;
+  matchDate?: Date;
 }
 
 const MatchSchema = new Schema(
@@ -42,6 +43,7 @@ const EventSchema: Schema = new Schema(
     organizerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     participants: [{ type: Schema.Types.ObjectId, ref: "User" }],
     matches: [MatchSchema],
+    matchDate: { type: Date, default: null },
   },
   { timestamps: true }
 );

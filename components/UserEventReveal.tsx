@@ -90,7 +90,7 @@ export function UserEventReveal({ event }: UserEventRevealProps) {
           </span>
           {event.giftDate && (
             <span>
-              Çekiliş Tarihi:{" "}
+              Hediyeleşme Tarihi:{" "}
               <span className="font-bold text-white">
                 {new Date(event.giftDate).toLocaleString("tr-TR", {
                   timeZone: "Europe/Istanbul",
@@ -99,6 +99,19 @@ export function UserEventReveal({ event }: UserEventRevealProps) {
               </span>
             </span>
           )}
+          {event.matchDate && (
+            <span>
+              Eşleşme Tarihi:{" "}
+              <span className="font-bold text-white">
+                {new Date(event.matchDate).toLocaleString("tr-TR", {
+                  timeZone: "Europe/Istanbul",
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+              </span>
+            </span>
+          )}
+
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center py-8 space-y-6">
@@ -128,13 +141,12 @@ export function UserEventReveal({ event }: UserEventRevealProps) {
                   Senin Eşleşmen:
                 </p>
                 <h2
-                  className={`${
-                    (event.matchName?.length || 0) > 15
-                      ? "text-xl"
-                      : (event.matchName?.length || 0) > 10
+                  className={`${(event.matchName?.length || 0) > 15
+                    ? "text-xl"
+                    : (event.matchName?.length || 0) > 10
                       ? "text-2xl"
                       : "text-3xl"
-                  } font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-500 text-center px-2`}
+                    } font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-500 text-center px-2`}
                 >
                   {event.matchName}
                 </h2>
